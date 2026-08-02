@@ -18,4 +18,4 @@ jobs:
 
       - run: pip install -r source/requirements.txt
 
-      - run: pyinstaller --onefile make_it.py
+      - run: pyinstaller --onefile source/make_it.py
