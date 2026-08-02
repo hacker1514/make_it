@@ -10,12 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - run: pip install -r source/requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r source/requirements.txt
+          pip install pyinstaller
 
-      - run: pyinstaller --onefile source/make_it.py
+      - name: Build executable
+        run: |
+          pyinstaller --onefile source/make_it.py
+
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: make_it-build
+          path: dist/make_it
