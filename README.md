@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/images/logo.svg" alt="Make It Logo" width="120" height="120">
+<img src="main/assets/images/logo.svg" alt="Make It Logo" width="120" height="120">
 
 # ⚡ Make It
 
@@ -55,7 +55,7 @@ Born from a simple observation: *developers spend too much time on repetitive ta
 
 | Terminal Agent | Project Generation | Setup Experience |
 | :---: | :---: | :---: |
-| ![Terminal](assets/images/terminal.png) | ![Commands](assets/images/commands.png) | ![Install](assets/images/install.png) |
+| ![Terminal](main/assets/images/terminal.png) | ![Commands](main/assets/images/commands.png) | ![Install](main/assets/images/install.png) |
 
 </div>
 
