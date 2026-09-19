@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import io
 import os
 import sys
-import io
 
 os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 
@@ -24,18 +24,18 @@ if sys.platform == "win32":
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPT_DIR)
 
+from prompt_toolkit import PromptSession
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.styles import Style
 from rich.align import Align
+from rich.columns import Columns
 from rich.console import Console
 from rich.markdown import Markdown
+from rich.padding import Padding
 from rich.panel import Panel
 from rich.rule import Rule
 from rich.text import Text
-from rich.columns import Columns
-from rich.padding import Padding
-from prompt_toolkit import PromptSession
-from prompt_toolkit.history import FileHistory
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from prompt_toolkit.styles import Style
 
 import config
 from agent.core import Agent
@@ -94,8 +94,6 @@ def print_banner():
     console.print(cmds)
     console.print()
 
-#about me 
-
     developer = Text(justify="left")
     developer.append("Developer   : ", style="dim")
     developer.append("Niranjan Kumar K", style="bold cyan")
@@ -127,11 +125,7 @@ def print_help():
         '  "refactor this project to use async/await throughout"\n\n'
         "[cyan]Navigation:[/cyan]\n"
         "  [dim]↑ / ↓ arrows[/dim]  Browse input history\n"
-        "  [dim]→ arrow[/dim]       Accept auto-suggestion\n\n"
-        "[cyan]API Key:[/cyan]\n"
-        "  Stored permanently in:\n"
-       f"  [yellow]{config.API_FILE}[/yellow]\n"
-        "  You will be prompted only on the first run.",
+        "  [dim]→ arrow[/dim]       Accept auto-suggestion\n",
         title="[bold cyan]make it  ·  Kni-org[/bold cyan]",
         border_style="cyan",
     ))
@@ -149,48 +143,6 @@ def print_response(text: str):
     console.print(Rule(style="dim"))
     console.print()
 
-
-def setup_api_key() -> str:
-
-    if config.API_KEY:
-        return config.API_KEY
-
-    console.print()
-    console.print(Panel(
-        "[bold yellow]Groq API Key Required[/bold yellow]\n\n"
-        "Enter your Groq API key below.\n"
-        "It will be saved permanently in:\n"
-        f"[cyan]{config.API_FILE}[/cyan]",
-        title="[bold cyan]First-Time Setup[/bold cyan]",
-        border_style="cyan",
-    ))
-    console.print()
-
-    while True:
-        try:
-            entered = input("Groq API Key: ").strip()
-        except (EOFError, KeyboardInterrupt):
-            console.print("\n[red]Setup cancelled.[/red]")
-            sys.exit(1)
-
-        if not entered:
-            console.print("[red]API key cannot be empty.[/red]")
-            continue
-
-        try:
-            import json
-
-            with open(config.API_FILE, "w", encoding="utf-8") as f:
-                json.dump({"api_key": entered}, f, indent=4)
-
-            config.API_KEY = entered
-
-            console.print("\n[green]✓ API key saved successfully.[/green]\n")
-
-            return entered
-
-        except Exception as e:
-            console.print(f"[red]Failed to save API key: {e}[/red]")
 
 def run_repl(agent: Agent, initial_prompt: str | None = None):
     os.makedirs(config.SESSION_DIR, exist_ok=True)
@@ -233,7 +185,6 @@ def run_repl(agent: Agent, initial_prompt: str | None = None):
             os.system("cls" if sys.platform == "win32" else "clear")
             continue
 
-
         console.print()
         try:
             response = agent.run(user_input)
@@ -253,7 +204,6 @@ def main():
     parser.add_argument("--version", action="version", version="make it  v1.0  ·  Kni-org")
     args = parser.parse_args()
 
-    setup_api_key()
     print_banner()
 
     agent = Agent()

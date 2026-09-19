@@ -8,6 +8,15 @@ from typing import Any
 from rich.console import Console
 from rich.markup import escape
 
+if sys.platform == "win32":
+    try:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        if hasattr(sys.stderr, "reconfigure"):
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
 from agent import llm, tools
@@ -31,6 +40,16 @@ _TOOL_ICONS = {
     "find_in_files":"🔎",
     "patch_json":   "🗄️ ",
 }
+
+
+def _safe_print(text: str):
+    try:
+        console.print(text)
+    except Exception:
+        try:
+            print(text.encode("ascii", "replace").decode("ascii"))
+        except Exception:
+            pass
 
 
 def _tool_label(name: str, args: dict) -> str:
@@ -76,7 +95,7 @@ def _print_tool_result(name: str, raw: str):
         return
 
     if "error" in data:
-        console.print(f"   [red]✗ {escape(str(data['error']))}[/red]")
+        _safe_print(f"   [red]✗ {escape(str(data['error']))}[/red]")
         return
 
     if name == "run_command":
@@ -84,44 +103,45 @@ def _print_tool_result(name: str, raw: str):
         stdout = (data.get("stdout") or "").strip()
         stderr = (data.get("stderr") or "").strip()
         status = "[green]✓ exit 0[/green]" if rc == 0 else f"[red]✗ exit {rc}[/red]"
-        console.print(f"   {status}")
+        _safe_print(f"   {status}")
         if stdout:
             lines = stdout.split("\n")
             shown = "\n   ".join(lines[:20])
             suffix = f"\n   [dim]… {len(lines) - 20} more lines[/dim]" if len(lines) > 20 else ""
-            console.print(f"   [dim]{escape(shown)}[/dim]{suffix}")
+            _safe_print(f"   [dim]{escape(shown)}[/dim]{suffix}")
         if stderr and rc != 0:
             lines = stderr.split("\n")
-            console.print(f"   [dim red]{escape(chr(10).join(lines[:10]))}[/dim red]")
+            _safe_print(f"   [dim red]{escape(chr(10).join(lines[:10]))}[/dim red]")
         return
 
     if name in ("write_file", "edit_file", "append_file", "create_dir",
                 "move_file", "copy_file", "delete_file", "patch_json"):
-        console.print("   [green]✓ done[/green]")
+        _safe_print("   [green]✓ done[/green]")
         return
 
     if name == "read_file":
         lines = (data.get("content") or "").split("\n")
-        console.print(f"   [dim]{escape(chr(10).join(lines[:6]))}[/dim]")
+        _safe_print(f"   [dim]{escape(chr(10).join(lines[:6]))}[/dim]")
         return
 
     if name == "list_dir":
-        keys = list((data.get("tree") or {}).keys())[:14]
-        console.print(f"   [dim]{escape(', '.join(keys))}[/dim]")
+        tree = data.get("tree") or {}
+        keys = list(tree.keys())[:14]
+        _safe_print(f"   [dim]{escape(', '.join(keys))}[/dim]")
         return
 
     if name == "search_web":
         for r in (data.get("results") or [])[:2]:
             snippet = (r.get("snippet") or "")[:120]
-            console.print(f"   [dim]• {escape(snippet)}[/dim]")
+            _safe_print(f"   [dim]• {escape(snippet)}[/dim]")
         return
 
     if name == "find_in_files":
         total = data.get("total", 0)
         matches = data.get("matches", [])[:3]
-        console.print(f"   [dim]{total} match(es)[/dim]")
+        _safe_print(f"   [dim]{total} match(es)[/dim]")
         for m in matches:
-            console.print(f"   [dim]{m['file']}:{m['line']}  {escape(m['text'][:80])}[/dim]")
+            _safe_print(f"   [dim]{m['file']}:{m['line']}  {escape(m['text'][:80])}[/dim]")
         return
 
 
@@ -146,10 +166,10 @@ class Agent:
                         tools=tools.TOOL_SCHEMAS,
                     )
                 except RuntimeError as e:
-                    console.print(f"\n[red]{e}[/red]")
+                    _safe_print(f"\n[red]{e}[/red]")
                     return str(e)
                 except Exception:
-                    console.print("\n[red]AI call failed[/red]")
+                    _safe_print("\n[red]AI call failed[/red]")
                     return "AI call failed"
 
             self.memory.add_assistant(msg)
@@ -168,7 +188,7 @@ class Agent:
                 except json.JSONDecodeError:
                     args = {}
 
-                console.print(f"  {_tool_label(fn_name, args)}")
+                _safe_print(f"  {_tool_label(fn_name, args)}")
                 result = tools.dispatch(fn_name, args)
                 _print_tool_result(fn_name, result)
                 self.memory.add_tool_result(tc_id, fn_name, result)

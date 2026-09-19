@@ -75,11 +75,11 @@
         <div class="faq">
           <details class="faq__item glass reveal">
             <summary>What is Make It?</summary>
-            <p>Make It is a Terminal AI Coding Agent that lets you build, edit, and generate software projects directly from your terminal using natural language. It's powered by the Groq API for lightning-fast AI responses.</p>
+            <p>Make It is a Terminal AI Coding Agent that lets you build, edit, and generate software projects directly from your terminal using natural language. It's powered by an intelligent AI Engine for fast, reliable responses.</p>
           </details>
           <details class="faq__item glass reveal">
             <summary>How do I install Make It?</summary>
-            <p>Download the appropriate setup script for your platform from the <a href="download.html">Download page</a>, run it, and follow the prompts. The installer will ask for your Groq API key once and save it permanently.</p>
+            <p>Download the appropriate setup script for your platform from the <a href="download.html">Download page</a>, run it, and follow the prompts.</p>
           </details>
           <details class="faq__item glass reveal">
             <summary>Does Make It work on my operating system?</summary>
@@ -87,11 +87,11 @@
           </details>
           <details class="faq__item glass reveal">
             <summary>What are the system requirements?</summary>
-            <p>Make It is very lightweight. You need a modern operating system (Windows 10+, Linux, macOS 12+), an internet connection, and a free Groq API key. No Python installation is required — the binary is self-contained.</p>
+            <p>Make It is very lightweight. You need a modern operating system (Windows 10+, Linux, macOS 12+) and an internet connection. No Python installation is required — the binary is self-contained.</p>
           </details>
           <details class="faq__item glass reveal">
             <summary>How do I update Make It?</summary>
-            <p>Simply re-run the setup script for your platform. It will download the latest version and update the binary. Your API key will be preserved.</p>
+            <p>Simply re-run the setup script for your platform. It will download the latest version and update the binary.</p>
           </details>
         </div>
       </div>
@@ -100,29 +100,13 @@
     <section class="section section--alt">
       <div class="container">
         <div class="section__header reveal">
-          <span class="section__label">API Keys</span>
-          <h2 class="section__title">Groq API Configuration</h2>
+          <span class="section__label">AI Engine</span>
+          <h2 class="section__title">AI Architecture</h2>
         </div>
         <div class="faq">
           <details class="faq__item glass reveal">
-            <summary>How do I get a Groq API key?</summary>
-            <p>Go to <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">console.groq.com/keys</a>, sign up for a free account, and create a new API key. It's free and requires no credit card.</p>
-          </details>
-          <details class="faq__item glass reveal">
-<summary>Where is my API key stored?</summary>
-            <p>Make It stores your API key in <code>~/.makeit/api.json</code> (or <code>%USERPROFILE%\.makeit\api.json</code> on Windows). This is a simple JSON file that Make It reads automatically every time it starts. The key is never stored inside your project folder.</p>
-          </details>
-          <details class="faq__item glass reveal">
-<summary>How do I change my API key?</summary>
-            <p>Simply delete the <code>~/.makeit/api.json</code> file and re-run the setup script. The installer will ask for your new key and validate it.</p>
-          </details>
-          <details class="faq__item glass reveal">
-<summary>Is my API key safe?</summary>
-            <p>Yes. The key is stored locally in <code>~/.makeit/api.json</code> and is never shared with anyone. Make It does not send your key anywhere except to the official Groq API for authentication.</p>
-          </details>
-          <details class="faq__item glass reveal">
-            <summary>Will I be asked for the key again?</summary>
-            <p>No. Make It is designed to ask for your API key only once during setup. After that, it reads the key automatically from <code>~/.makeit/api.json</code> every time you run it.</p>
+            <summary>How does the AI Engine work?</summary>
+            <p>Make It uses an advanced dual AI architecture with automatic fallback to ensure high availability and fast responses.</p>
           </details>
         </div>
       </div>
@@ -136,20 +120,12 @@
         </div>
         <div class="faq">
           <details class="faq__item glass reveal">
-<summary>Make It says "API key not found"</summary>
-            <p>This means the <code>~/.makeit/api.json</code> file is missing or invalid. Run the setup script again to re-configure your API key.</p>
-          </details>
-          <details class="faq__item glass reveal">
-            <summary>The setup script says "Invalid API key"</summary>
-            <p>Your API key might be incorrect or expired. Verify your key at <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">console.groq.com</a>. Make sure you copied the entire key starting with <code>gsk_</code>.</p>
-          </details>
-          <details class="faq__item glass reveal">
             <summary>Make It is slow to respond</summary>
-            <p>Check your internet connection. Groq API responses are typically under 1 second. If you're on a slow connection, responses may be delayed. Also verify API rate limits on your Groq account.</p>
+            <p>Check your internet connection. AI responses are typically instant under standard network conditions.</p>
           </details>
           <details class="faq__item glass reveal">
-<summary>How do I completely uninstall Make It?</summary>
-            <p>Delete the binary from the install location (e.g., <code>/usr/local/bin/makeit</code> or <code>%USERPROFILE%\.makeit\makeit.exe</code>), delete the <code>~/.makeit/api.json</code> file, and remove the <code>~/.makeit</code> directory. Also remove any PATH entries added by the installer.</p>
+            <summary>How do I completely uninstall Make It?</summary>
+            <p>Delete the binary from the install location (e.g., <code>/usr/local/bin/makeit</code> or <code>%USERPROFILE%\.makeit\makeit.exe</code>) and remove the <code>~/.makeit</code> directory. Also remove any PATH entries added by the installer.</p>
           </details>
           <details class="faq__item glass reveal">
             <summary>Make It doesn't work in Termux</summary>
@@ -178,7 +154,7 @@
             <img src="assets/images/logo.svg" alt="" width="36" height="36">
             <div><strong>Make It</strong><p>By Niranjan Kumar K · KNI-ORG</p></div>
           </div>
-          <p class="footer__desc">A Terminal AI Coding Agent powered by Groq.</p>
+          <p class="footer__desc">A Terminal AI Coding Agent.</p>
         </div>
         <div>
           <h4 class="footer__heading">Product</h4>

@@ -38,50 +38,11 @@ powershell -NoProfile -Command "Write-Host 'PATH updated.' -ForegroundColor Gree
 
 echo.
 echo ----------------------------------------
-powershell -NoProfile -Command "Write-Host 'Groq API Key Configuration' -ForegroundColor Cyan"
-echo ----------------------------------------
-
-set /p AI_KEY="Enter Groq API Key: "
-
-if "%AI_KEY%"=="" (
-    echo API key empty
-    pause
-    exit /b 1
-)
-
-echo.
-powershell -NoProfile -Command "Write-Host 'Validating API key...' -ForegroundColor Yellow"
-
-curl -s ^
--H "Authorization: Bearer %AI_KEY%" ^
-https://api.groq.com/openai/v1/models ^
--o "%TEMP%\groq.json"
-
-findstr "object" "%TEMP%\groq.json" >nul
-
-if errorlevel 1 (
-    powershell -NoProfile -Command "Write-Host 'Invalid API key' -ForegroundColor Red"
-    del "%TEMP%\groq.json"
-    pause
-    exit /b 1
-)
-
-powershell -NoProfile -Command "Write-Host 'API key verified!' -ForegroundColor Green"
-
-(
-echo {
-echo   "api_key": "%AI_KEY%"
-echo }
-) > "%DATA%\api.json"
-
-echo.
-echo ----------------------------------------
 powershell -NoProfile -Command "Write-Host 'Make It Installed Successfully!' -ForegroundColor Green"
 echo ----------------------------------------
 
 echo Location : %INSTALL%
 echo Binary   : %BIN%\makeit.exe
-echo Config   : %DATA%\api.json
 
 echo.
 echo Close this CMD and open a new one.

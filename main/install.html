@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Install Make It in under a minute. Add your Groq API key once and it's stored permanently in ~/.makeit/api.json.">
-  <meta name="keywords" content="Make It, install, setup, Groq API key, api.json">
+  <meta name="description" content="Install Make It in under a minute. Simple setup script for your terminal.">
+  <meta name="keywords" content="Make It, install, setup, CLI, Python">
   <meta name="author" content="Niranjan Kumar K">
   <meta name="theme-color" content="#10b981">
   <meta property="og:title" content="Install Make It — Terminal AI Coding Agent">
-  <meta property="og:description" content="60-second setup. One API key, stored forever in ~/.makeit/api.json.">
+  <meta property="og:description" content="60-second setup for Windows, Linux, macOS, WSL, and Termux.">
   <meta property="og:type" content="website">
   <title>Installation — Make It</title>
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
@@ -69,7 +69,7 @@
         </nav>
         <div class="page-hero__badge reveal">Installation</div>
         <h1 class="reveal">Set Up <span class="gradient-text">Make It</span></h1>
-        <p class="reveal">Download the setup script, run it, enter your Groq API key once — and it's saved permanently in <code>~/.makeit/api.json</code>. You'll never be asked again.</p>
+        <p class="reveal">Download the setup script, run it in your terminal, and you're ready to start building!</p>
       </div>
     </section>
 
@@ -82,20 +82,19 @@
           <p class="section__subtitle">This is what the installer will look like. The real setup runs in your terminal.</p>
         </div>
         <div class="wizard glass reveal">
-          <h3 class="wizard__title">Groq API Key</h3>
-          <p class="wizard__desc">Enter your Groq API key. It will be validated and stored permanently in <code>~/.makeit/api.json</code>.</p>
+          <h3 class="wizard__title">Quick Setup</h3>
+          <p class="wizard__desc">Enter your preference configuration key if needed.</p>
           <form id="wizardForm" novalidate>
             <div class="wizard__field">
-              <label for="apiKey">Enter your Groq API Key:</label>
-              <input type="password" id="apiKey" name="apiKey" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" spellcheck="false">
-              <p class="wizard__hint">Get a free key at <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">console.groq.com/keys</a></p>
+              <label for="apiKey">Configuration Key (Optional):</label>
+              <input type="password" id="apiKey" name="apiKey" placeholder="Enter optional key..." autocomplete="off" spellcheck="false">
             </div>
             <div class="wizard__error" id="wizardError" role="alert"></div>
             <div class="wizard__actions">
               <button type="submit" class="btn btn--primary ripple">Validate &amp; Save</button>
               <button type="reset" class="btn btn--ghost ripple" onclick="document.getElementById('wizardOk').classList.remove('show');document.getElementById('apiKey').disabled=false;this.form.querySelector('button[type=submit]').style.display='';this.form.querySelector('button[type=submit]').textContent='Validate & Save';">Reset</button>
             </div>
-            <div class="wizard__ok" id="wizardOk">✅ API key validated! In the real setup, it is now saved to <code>~/.makeit/api.json</code>.</div>
+            <div class="wizard__ok" id="wizardOk">✅ Setup complete! In the real setup, Make It is ready to run.</div>
           </form>
         </div>
       </div>
@@ -199,8 +198,8 @@
           <div class="info-card glass reveal">
             <h4>📄 Format</h4>
             <div class="code-block" style="margin:0;">
-              <pre><code>{
-  "api_key": "gsk_your_groq_api_key_here"
+               <pre><code>{
+  "api_key": "your_api_key_here"
 }</code></pre>
             </div>
           </div>
@@ -220,8 +219,8 @@
     <section class="section section--alt">
       <div class="container">
         <div class="cta-banner glass reveal">
-          <h2>Never ask again.</h2>
-          <p>After setup, just run <code>makeit</code>. The API key is read automatically from <code>~/.makeit/api.json</code>.</p>
+          <h2>Ready to code.</h2>
+          <p>After setup, just run <code>makeit</code> in your terminal.</p>
           <a href="download.html" class="btn btn--primary btn--lg ripple">Download Make It</a>
         </div>
       </div>
@@ -239,7 +238,7 @@
               <p>By Niranjan Kumar K · KNI-ORG</p>
             </div>
           </div>
-          <p class="footer__desc">A Terminal AI Coding Agent powered by Groq. Build, edit, and generate projects from your terminal.</p>
+          <p class="footer__desc">A Terminal AI Coding Agent. Build, edit, and generate projects from your terminal.</p>
         </div>
         <div>
           <h4 class="footer__heading">Product</h4>

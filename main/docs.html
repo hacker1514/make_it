@@ -96,7 +96,7 @@
                 </div>
                 <div class="info-card glass">
                   <h4>🧠 AI Layer</h4>
-                  <p>Orchestrates communication with the Groq API. Manages streaming responses, context windows, and retry logic.</p>
+                  <p>Orchestrates communication with the dual AI Engine. Manages context windows and automatic fallback logic.</p>
                 </div>
                 <div class="info-card glass">
                   <h4>🔧 Tool System</h4>
@@ -107,7 +107,7 @@
                   <p>Persists project context, conversation history, and user preferences across sessions.</p>
                 </div>
               </div>
-              <p>The AI communicates with the Groq API via HTTP requests. Responses are streamed in real-time to the terminal. The tool system is a set of Python functions that the AI can call to perform actions like reading files, writing files, and executing commands.</p>
+              <p>The AI communicates with the AI Engine via HTTP requests. Responses are rendered in real-time to the terminal. The tool system is a set of Python functions that the AI can call to perform actions like reading files, writing files, and executing commands.</p>
             </section>
 
             <!-- Folder Structure -->
@@ -132,7 +132,7 @@
                 │   │   └── <span class="file">context.py</span><br>
                 │   ├── <span class="file">llm/</span> &nbsp;<span class="comment"># LLM integration</span><br>
                 │   │   ├── <span class="file">__init__.py</span><br>
-                │   │   ├── <span class="file">groq_client.py</span><br>
+                │   │   ├── <span class="file">ai_client.py</span><br>
                 │   │   └── <span class="file">prompts.py</span><br>
                 │   └── <span class="file">utils/</span> &nbsp;<span class="comment"># Utilities</span><br>
                 │       ├── <span class="file">__init__.py</span><br>
@@ -146,7 +146,7 @@
             <!-- Configuration -->
             <section class="docs-section" id="configuration">
               <h2>Configuration</h2>
-              <p>Make It uses environment variables for configuration. The only required variable is your Groq API key.</p>
+              <p>Make It uses configuration options for custom setups.</p>
               <table class="data-table glass">
                 <thead>
                   <tr>
@@ -158,13 +158,13 @@
                 <tbody>
                   <tr>
                     <td><code>AI_API_KEY</code></td>
-                    <td>Yes</td>
-                    <td>Your Groq API key. Set during setup, never asked again.</td>
+                    <td>No</td>
+                    <td>Optional AI authentication key.</td>
                   </tr>
                   <tr>
                     <td><code>MAKEIT_MODEL</code></td>
                     <td>No</td>
-                    <td>Groq model to use (default: <code>mixtral-8x7b-32768</code>)</td>
+                    <td>Model to use for AI responses</td>
                   </tr>
                   <tr>
                     <td><code>MAKEIT_TEMP</code></td>
@@ -339,15 +339,15 @@
             <!-- LLM System -->
             <section class="docs-section" id="llm-system">
               <h2>LLM System</h2>
-              <p>Make It integrates with the Groq API to deliver lightning-fast AI responses:</p>
+              <p>Make It integrates with an intelligent AI Engine architecture to deliver fast AI responses:</p>
               <div class="info-cards">
                 <div class="info-card glass">
-                  <h4>⚡ Groq API</h4>
-                  <p>Uses Groq's LPU inference engine for responses at up to 1,200 tokens per second. Supports streaming for real-time output.</p>
+                  <h4>⚡ AI Engine</h4>
+                  <p>Uses a dual AI architecture with automatic fallback for maximum uptime and reliability.</p>
                 </div>
                 <div class="info-card glass">
-                  <h4>🧠 Model Selection</h4>
-                  <p>Default model is Mixtral 8x7B (32K context). Customizable via <code>MAKEIT_MODEL</code> environment variable.</p>
+                  <h4>🧠 High Reliability</h4>
+                  <p>Primary and secondary AI fallback ensures uninterrupted service.</p>
                 </div>
                 <div class="info-card glass">
                   <h4>📝 System Prompt</h4>
@@ -355,10 +355,10 @@
                 </div>
                 <div class="info-card glass">
                   <h4>🔄 Streaming</h4>
-                  <p>Responses are streamed token by token, giving you real-time feedback as the AI "types" its response.</p>
+                  <p>Responses are displayed in real-time, giving you quick feedback as the AI processes your requests.</p>
                 </div>
               </div>
-              <p>The LLM system is designed to be modular. Future updates will add support for additional providers and local models.</p>
+              <p>The LLM system is designed to be modular and reliable.</p>
             </section>
 
           </div>
@@ -385,7 +385,7 @@
             <img src="assets/images/logo.svg" alt="" width="36" height="36">
             <div><strong>Make It</strong><p>By Niranjan Kumar K · KNI-ORG</p></div>
           </div>
-          <p class="footer__desc">A Terminal AI Coding Agent powered by Groq.</p>
+          <p class="footer__desc">A Terminal AI Coding Agent.</p>
         </div>
         <div>
           <h4 class="footer__heading">Product</h4>

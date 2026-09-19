@@ -602,14 +602,13 @@
         const value = keyInput.value.trim();
 
         if (!value) {
-          errorBox.textContent = 'Please enter your Groq API key.';
+          errorBox.textContent = 'Please enter your configuration key.';
           errorBox.classList.add('show');
           return;
         }
 
-        // Basic format check: Groq keys look like gsk_xxxx...
-        if (!/^gsk_[A-Za-z0-9_\-]{20,}$/.test(value)) {
-          errorBox.textContent = 'The API key format looks invalid. Groq keys start with "gsk_".';
+        if (value.length < 5) {
+          errorBox.textContent = 'The key format looks invalid.';
           errorBox.classList.add('show');
           return;
         }

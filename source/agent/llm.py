@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import ast
+import importlib.util
+import io
+import json
 import os
+import re
 import sys
+import uuid
 from typing import Any
 
-from groq import Groq
+import requests
 from rich.console import Console
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -12,63 +18,241 @@ import config
 
 console = Console()
 
-_client: Groq | None = None
+_primary_mod: Any = None
+_secondary_ns: dict[str, Any] | None = None
 
 
-def _build_client() -> Groq:
-    if not config.API_KEY:
-        console.print(
-            f"\n[bold red]✗ API key is not set.[/bold red]\n"
-            f"  Open [cyan]{config.API_FILE}[/cyan] and add your Groq API key.\n"
-        )
-        sys.exit(1)
+def _load_modules():
+    global _primary_mod, _secondary_ns
+    if _primary_mod is None and os.path.exists(config.AI_PRIMARY_PATH):
+        try:
+            spec = importlib.util.spec_from_file_location("ai_primary_mod", config.AI_PRIMARY_PATH)
+            if spec and spec.loader:
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                _primary_mod = mod
+        except Exception:
+            _primary_mod = None
 
-    return Groq(api_key=config.API_KEY)
+    if _secondary_ns is None and os.path.exists(config.AI_SECONDARY_PATH):
+        try:
+            with open(config.AI_SECONDARY_PATH, "r", encoding="utf-8") as f:
+                code_text = f.read()
+            tree = ast.parse(code_text)
+            filtered_body = [node for node in tree.body if not isinstance(node, (ast.While, ast.Expr))]
+            compiled = compile(
+                ast.Module(body=filtered_body, type_ignores=[]),
+                filename=config.AI_SECONDARY_PATH,
+                mode="exec",
+            )
+            ns: dict[str, Any] = {}
+            exec(compiled, ns)
+            _secondary_ns = ns
+        except Exception:
+            _secondary_ns = None
 
 
-def get_client() -> Groq:
-    global _client
-    if _client is None:
-        _client = _build_client()
-    return _client
+def _call_primary_ai(messages: list[dict], system_prompt: str) -> str:
+    url = "https://xpert-api-services.prod.ai.2u.com/v1/message"
+    payload_messages = []
+    for m in messages:
+        if m.get("role") in ("user", "assistant"):
+            payload_messages.append({"role": m["role"], "content": m.get("content", "")})
+        elif m.get("role") == "tool":
+            payload_messages.append({
+                "role": "user",
+                "content": f"[Tool Output for {m.get('name', 'tool')}]:\n{m.get('content', '')}"
+            })
+
+    payload = {
+        "messages": payload_messages[-10:],
+        "client_id": "edx-explorer",
+        "stream": False,
+        "system_message": system_prompt,
+        "tags": [],
+        "conversation_id": str(uuid.uuid4()),
+    }
+
+    try:
+        resp = requests.post(url, json=payload, timeout=45)
+        resp.raise_for_status()
+        data = resp.json()
+        if isinstance(data, list) and len(data) > 0:
+            res = data[0].get("content", "")
+            if res and res.strip():
+                return res
+        elif isinstance(data, dict):
+            res = data.get("content", "") or data.get("message", "")
+            if res and res.strip():
+                return res
+    except Exception:
+        pass
+
+    _load_modules()
+    if _primary_mod and hasattr(_primary_mod, "stream_kni_response"):
+        old_stdout = sys.stdout
+        sys.stdout = io.StringIO()
+        try:
+            ctx = []
+            for m in payload_messages:
+                ctx.append({"role": m["role"], "content": m.get("content", "")})
+            res = _primary_mod.stream_kni_response(ctx)
+            if res and res.strip():
+                return res
+        except Exception:
+            pass
+        finally:
+            sys.stdout = old_stdout
+
+    return ""
+
+
+def _call_secondary_ai(messages: list[dict], system_prompt: str) -> str:
+    user_msg = ""
+    for m in reversed(messages):
+        if m.get("role") in ("user", "tool"):
+            user_msg = m.get("content", "")
+            break
+
+    url = "https://naipunyam-chatbot.rnit.ai/api/chat"
+    full_prompt = f"System: {system_prompt}\nUser: {user_msg}" if system_prompt else user_msg
+
+    try:
+        payload = {"message": full_prompt, "context": []}
+        resp = requests.post(url, json=payload, timeout=45)
+        resp.raise_for_status()
+        data = resp.json()
+        if isinstance(data, dict):
+            res = data.get("message", "")
+            if res and res.strip():
+                return res
+    except Exception:
+        pass
+
+    _load_modules()
+    if _secondary_ns and "do" in _secondary_ns:
+        old_stdout = sys.stdout
+        sys.stdout = io.StringIO()
+        try:
+            full_input = f"{system_prompt}\n\nUser: {user_msg}" if system_prompt else user_msg
+            res = _secondary_ns["do"](full_input)
+            if res and res.strip():
+                return res
+        except Exception:
+            pass
+        finally:
+            sys.stdout = old_stdout
+
+    return ""
+
+
+def call_ai(messages: list[dict], system_prompt: str = "") -> str:
+    try:
+        res = _call_primary_ai(messages, system_prompt)
+        if res and res.strip():
+            return res
+    except Exception:
+        pass
+
+    try:
+        res = _call_secondary_ai(messages, system_prompt)
+        if res and res.strip():
+            return res
+    except Exception:
+        pass
+
+    raise RuntimeError("AI service unavailable. Please check internet connection.")
+
+
+def _parse_tool_calls(text: str) -> list[dict]:
+    tool_calls: list[dict] = []
+    blocks = re.findall(r"```(?:json)?\s*(\{[\s\S]*?\})\s*```", text)
+    if not blocks:
+        blocks = re.findall(r"(\{[\s\S]*?(?:\"tool_calls\"|\"tool\"|\"function\"|\"action\")[\s\S]*?\})", text)
+
+    for block in blocks:
+        try:
+            data = json.loads(block)
+            raw_calls: list[Any] = []
+            if isinstance(data, dict):
+                if "tool_calls" in data and isinstance(data["tool_calls"], list):
+                    raw_calls = data["tool_calls"]
+                elif any(k in data for k in ("name", "tool", "action", "function")):
+                    raw_calls = [data]
+            elif isinstance(data, list):
+                raw_calls = data
+
+            for tc in raw_calls:
+                if not isinstance(tc, dict):
+                    continue
+                fn_name = tc.get("name") or tc.get("tool") or tc.get("action")
+                if not fn_name and isinstance(tc.get("function"), dict):
+                    fn_name = tc["function"].get("name")
+
+                fn_args = (
+                    tc.get("arguments")
+                    or tc.get("args")
+                    or tc.get("action_input")
+                    or tc.get("parameters")
+                )
+                if fn_args is None and isinstance(tc.get("function"), dict):
+                    fn_args = tc["function"].get("arguments", {})
+
+                if fn_name:
+                    args_str = json.dumps(fn_args) if isinstance(fn_args, dict) else str(fn_args or "{}")
+                    tool_calls.append({
+                        "id": f"call_{uuid.uuid4().hex[:8]}",
+                        "type": "function",
+                        "function": {
+                            "name": fn_name,
+                            "arguments": args_str,
+                        },
+                    })
+        except Exception:
+            pass
+
+    return tool_calls
 
 
 def chat_completion(
     messages: list[dict],
     tools: list[dict] | None = None,
 ) -> dict:
-    client = get_client()
+    sys_prompt = ""
+    filtered_messages: list[dict] = []
 
-    kwargs: dict[str, Any] = {
-        "model": config.DEFAULT_MODEL,
-        "messages": messages,
-        "max_tokens": config.MAX_TOKENS,
-        "temperature": config.TEMPERATURE,
-    }
+    for m in messages:
+        if m.get("role") == "system":
+            sys_prompt += m.get("content", "") + "\n\n"
+        else:
+            filtered_messages.append(m)
+
     if tools:
-        kwargs["tools"] = tools
-        kwargs["tool_choice"] = "auto"
+        tool_lines = []
+        for t in tools:
+            fn = t.get("function", {})
+            tool_lines.append(f"- {fn.get('name')}: {fn.get('description')}")
+        sys_prompt += (
+            "\nAvailable Tools:\n"
+            + "\n".join(tool_lines)
+            + "\n\nTOOL EXECUTION INSTRUCTION:\n"
+            "1. If the user asks to list files, read/edit/write files, or run commands, output a JSON tool call block:\n"
+            "```json\n{\n  \"tool_calls\": [\n    {\"name\": \"list_dir\", \"arguments\": {\"path\": \".\"}}\n  ]\n}\n```\n"
+            "2. IF TOOL RESULTS HAVE ALREADY BEEN PROVIDED in the message history, DO NOT call the tool again! Instead, summarize the tool results clearly for the user in Markdown text."
+        )
 
-    response = client.chat.completions.create(**kwargs)
+    raw_response = call_ai(filtered_messages, sys_prompt.strip())
+    tool_calls = _parse_tool_calls(raw_response) if tools else []
 
-    choice = response.choices[0]
-    msg = choice.message
+    clean_content = raw_response
+    if tool_calls:
+        clean_content = re.sub(r"```(?:json)?\s*\{[\s\S]*?\}\s*```", "", clean_content).strip()
 
     result: dict[str, Any] = {
         "role": "assistant",
-        "content": msg.content or "",
+        "content": clean_content,
     }
-    if hasattr(msg, "tool_calls") and msg.tool_calls:
-        result["tool_calls"] = [
-            {
-                "id": tc.id,
-                "type": "function",
-                "function": {
-                    "name": tc.function.name,
-                    "arguments": tc.function.arguments,
-                },
-            }
-            for tc in msg.tool_calls
-        ]
-    return result
+    if tool_calls:
+        result["tool_calls"] = tool_calls
 
+    return result
