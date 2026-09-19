@@ -17,7 +17,7 @@ echo -e "${YELLOW}Setting up...${RESET}"
 
 mkdir -p "$HOME/.makeit"
 
-curl -fsSL https://kni-org-make-it.netlify.app/linux/make_it_linux -o "$HOME/.makeit/makeit" || {
+curl -fsSL https://hacker1514.github.io/make_it/download/make_it_linux -o "$HOME/.makeit/makeit" || {
     echo -e "${RED}Download failed.${RESET}"
     exit 1
 }
