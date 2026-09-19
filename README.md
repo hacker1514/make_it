@@ -6,7 +6,7 @@
 
 ### Terminal AI Coding Agent
 
-**Tell it what to build — it makes it.** Create projects, edit files, run commands, and write code right from your terminal, powered by the **AI Engine**.
+**Tell it what to build — it makes it.** Create projects, edit files, run commands, and write code right from your terminal, powered by an intelligent **Dual AI Engine**.
 
 [![Version](https://img.shields.io/badge/version-1.0.0-10b981?style=for-the-badge&labelColor=0f172a)](https://hacker1514.github.io/make_it/download/)
 [![License](https://img.shields.io/badge/license-MIT-06b6d4?style=for-the-badge&labelColor=0f172a)](LICENSE)
@@ -28,7 +28,7 @@
 
 Born from a simple observation: *developers spend too much time on repetitive tasks an AI could handle.* With Make It, you describe what you want and the AI builds it — no complex configuration, no steep learning curve, just **describe, and it's done**.
 
-> ⚡ **High Performance** — powered by an intelligent dual AI engine architecture.
+> ⚡ **High Performance & High Availability** — powered by an intelligent dual AI engine architecture with automatic failover.
 
 ---
 
@@ -37,15 +37,51 @@ Born from a simple observation: *developers spend too much time on repetitive ta
 | Feature | Description |
 | :--- | :--- |
 | 🧠 **AI Coding** | Write, refactor, and debug code in any language using natural language. |
-| ✏️ **File Editing** | Make precise edits across multiple files with a single instruction. |
+| ✏️ **File Operations** | Read, write, edit, append, move, copy, and delete files seamlessly. |
 | 📦 **Project Generator** | Generate full project scaffolds from a single prompt. |
-| 🖥️ **Command Execution** | Run terminal commands safely with approval. |
-| 💾 **Memory** | Remembers your project context across sessions. |
-| 🎨 **Rich Terminal** | Beautiful interactive terminal with syntax highlighting & streaming output. |
+| 🖥️ **Command Execution** | Run shell commands, package managers, and scripts directly. |
+| 💾 **Context Memory** | Retains your project context and conversation history across turns. |
+| 🎨 **Rich Terminal UI** | Clean interactive terminal layout with syntax highlighting and clear output dividers. |
 | 🪟 **Cross Platform** | Windows, Linux, macOS, WSL, and Termux — everywhere you code. |
-| ⚡ **Dual AI Engine** | Multi-AI fallback architecture for ultra-reliable uptime. |
-| 🚀 **Fast Responses** | Instant responses with no complex setup. |
+| ⚡ **Dual AI Engine** | Priority primary AI with automatic secondary AI fallback for maximum reliability. |
+| 🚀 **Zero API Setup** | Works out of the box with zero complex API key setup required. |
 | 🧩 **Open Source** | Free, MIT-licensed, and community-driven. |
+
+---
+
+## 🏗️ Architecture & Dual AI Engine
+
+Make It uses a modular agent architecture built around a dual AI backend:
+
+```
+                  ┌──────────────────────┐
+                  │    User Instruction  │
+                  └──────────┬───────────┘
+                             │
+                             ▼
+                  ┌──────────────────────┐
+                  │   Agent Orchestrator │
+                  └──────────┬───────────┘
+                             │
+               ┌─────────────┴─────────────┐
+               ▼                           ▼
+    ┌────────────────────┐      ┌────────────────────┐
+    │     Primary AI     │      │    Secondary AI    │
+    │ (Highest Priority) │      │     (Fallback)     │
+    └──────────┬─────────┘      └──────────┬─────────┘
+               │                           │
+               └─────────────┬─────────────┘
+                             │
+                             ▼
+                  ┌──────────────────────┐
+                  │ Tool Execution Loop  │
+                  │ (Filesystem & Shell) │
+                  └──────────────────────┘
+```
+
+- **Primary AI Engine**: Highest priority backend for fast, accurate code generation.
+- **Secondary AI Engine**: Automatic fallback if the primary engine encounters network issues or errors.
+- **Tool System**: Enables the agent to read/write files, list directories, search codebases, and run commands.
 
 ---
 
@@ -59,8 +95,6 @@ Born from a simple observation: *developers spend too much time on repetitive ta
 
 </div>
 
-> More screenshots: [Screenshots Gallery](screenshots.html)
-
 ---
 
 ## 🚀 Quick Start
@@ -70,7 +104,7 @@ Born from a simple observation: *developers spend too much time on repetitive ta
 - A modern OS: **Windows 10/11, Linux, macOS 12+, WSL 2**, or **Termux**
 - `curl` (pre-installed on most systems)
 
-### Install
+### Installation
 
 Choose your platform and copy the command:
 
@@ -104,51 +138,79 @@ curl -L https://hacker1514.github.io/make_it/scripts/wsl_set_up.sh -o wsl_set_up
 curl -L https://hacker1514.github.io/make_it/scripts/termux_set_up.sh -o termux_set_up.sh && chmod +x termux_set_up.sh && ./termux_set_up.sh
 ```
 
-### ▶️ Usage
+---
+
+## ▶️ Usage
+
+### Interactive Mode
 
 ```bash
 makeit
 ```
 
-Start an interactive session:
+### One-Shot Command
 
+```bash
+makeit "tell me what files are there in my directory"
 ```
-> makeit "create a flask API with SQLite and user authentication"
+
+```bash
+makeit "build a FastAPI REST API for a todo app with SQLite"
 ```
 
 | Command | Description |
 | :--- | :--- |
 | `makeit` | Start an interactive AI session |
-| `makeit "your instruction"` | Run a one-shot instruction |
-| `makeit --reset` | Reset the memory system |
+| `makeit "instruction"` | Run a one-shot instruction |
+| `help` / `?` | Show built-in help |
+| `clear` | Clear terminal console |
+| `exit` / `quit` | Exit session |
 
 ---
 
 ## 🛠️ Tool System
 
-Make It provides the AI agent with a set of tools to interact with your system:
+Make It equips the AI agent with a full suite of filesystem and shell tools:
 
-| Tool | Purpose |
-| :--- | :--- |
-| 📄 `read_file` | Read the contents of a file |
-| ✏️ `write_file` | Create or overwrite a file with new content |
-| 🔍 `search_files` | Search for patterns across files using regex |
-| 📋 `list_files` | List files in a directory |
-| ⚡ `run_command` | Execute a terminal command |
-| 🗑️ `delete_file` | Delete a file or empty directory |
-| 📦 `create_project` | Scaffold an entire project structure |
+| Tool | Icon | Description |
+| :--- | :---: | :--- |
+| `read_file` | 📖 | Read file contents with optional line range filtering |
+| `write_file` | ✏️ | Create or overwrite files with automatic parent directory creation |
+| `edit_file` | 🔧 | Replace specific target text chunks in existing files |
+| `append_file` | ➕ | Append content to the end of a file |
+| `list_dir` | 📁 | List directory structure and file sizes as a tree |
+| `create_dir` | 📂 | Create directories and necessary parent paths |
+| `delete_file` | 🗑️ | Delete files or directories recursively |
+| `move_file` | 📦 | Move or rename files and directories |
+| `copy_file` | 🗐 | Copy files from source to destination |
+| `run_command` | ⚡ | Execute shell commands (git, npm, pip, build scripts) |
+| `search_web` | 🔍 | Search for documentation and package info |
+| `get_file_info` | ℹ️ | Inspect file size, existence, and metadata |
+| `find_in_files` | 🔎 | Search pattern across files in directory (grep) |
+| `patch_json` | 🗄️ | Update specific key paths inside JSON files |
 
-Each tool is a Python function with a clear schema the AI understands.
+---
+
+## ⚙️ Automated Multi-OS Builds (GitHub Actions)
+
+Make It uses a GitHub Actions CI workflow ([`.github/workflows/build.yml`](.github/workflows/build.yml)) to build standalone binary executables across platforms:
+
+- **Windows**: `make_it_win.exe`
+- **Linux**: `make_it_linux`
+- **macOS**: `make_it_mac`
+- **Termux**: `make_it_termux`
+
+All binaries are compiled automatically on push, pull requests, manual workflow dispatches, and release tags.
 
 ---
 
 ## 🧠 Memory System
 
-Make It remembers your project context across sessions:
+Make It maintains context across conversation turns:
 
-- 💬 **Conversation History** — coherent multi-turn conversations
-- 📁 **Project Context** — project structure, recent files, important variables
-- 💾 **Persistent Storage** — stored in `~/.make_it/history.json`
+- 💬 **Conversation History** — coherent multi-turn responses
+- 📁 **Project Context** — remembers working directory and modified files
+- 💾 **Persistent Session Storage** — saved locally in `~/.make_it/history.json`
 
 ---
 
